@@ -1208,24 +1208,29 @@ const weekly = [
   }
 ]
 
-const dailyGraphData = daily.map(data => { 
-  return {date: data.daily, data: data.alert[0].impactCount}
+const parseDate = d3.timeFormat("%m/%d/%y");
+
+const addCommas = (nStr) => {
+  nStr += '';
+  var x = nStr.split('.');
+  var x1 = x[0];
+  var x2 = x.length > 1 ? '.' + x[1] : '';
+  var rgx = /(\d+)(\d{3})/;
+  while (rgx.test(x1)) {
+    x1 = x1.replace(rgx, '$1' + ',' + '$2');
+  }
+  return x1 + x2;
+}
+
+const dailyGraphData = daily.map(data => {
+  return { date: parseDate(new Date(data.daily)), data: addCommas(data.alert[0].impactCount) }
 })
-const weeklyGraphData = weekly.map(data => { 
-  return {date: data.daily, data: data.alert[0].impactCount}
+const weeklyGraphData = weekly.map(data => {
+  return { date: parseDate(new Date(data.daily)), data: addCommas(data.alert[0].impactCount) }
 })
 
-const parseDate = d3.timeFormat("%m/%d/%y");
-const addCommas = (nStr) => {
-    nStr += '';
-    var x = nStr.split('.');
-    var x1 = x[0];
-    var x2 = x.length > 1 ? '.' + x[1] : '';
-    var rgx = /(\d+)(\d{3})/;
-    while (rgx.test(x1)) {
-        x1 = x1.replace(rgx, '$1' + ',' + '$2');
-    }
-    return x1 + x2;
+const parseData = (start, end, delimiter) => {
+
 }
 
 const dataset = dailyGraphData.map(data => data.data);
@@ -1242,10 +1247,10 @@ const svg = d3.select('svg')
   .attr("height", svgHeight)
   .attr("class", "bar-chart");
 
-const sorted = [...dataset].sort((a,b) => a - b)
+const sorted = [...dataset].sort((a, b) => a - b)
 
 let yScale;
-if(dataset.includes(0)){
+if (dataset.includes(0)) {
   yScale = d3.scaleLinear().range([svgHeight, svgHeight * .05])
 } else {
   yScale = d3.scaleLinear().range([svgHeight - svgHeight * .05, svgHeight * .05])
@@ -1273,7 +1278,7 @@ const barChart = svg.selectAll("rect")
     div.transition()
       .duration(200)
       .style("opacity", .9);
-    div.html(parseDate(new Date(d.date)) + "<br/>" + addCommas(d.data))
+    div.html(d.date + "<br/>" + d.data)
       .style("left", (d3.event.pageX) + "px")
       .style("top", (d3.event.pageY - 28) + "px");
   })
