@@ -1223,14 +1223,16 @@ const addCommas = (nStr) => {
 }
 
 const dailyGraphData = daily.map(data => {
-  return { date: parseDate(new Date(data.daily)), data: addCommas(data.alert[0].impactCount) }
+  return { date: parseDate(new Date(data.daily)), data: data.alert[0].impactCount }
 })
 const weeklyGraphData = weekly.map(data => {
-  return { date: parseDate(new Date(data.daily)), data: addCommas(data.alert[0].impactCount) }
+  return { date: parseDate(new Date(data.daily)), data: data.alert[0].impactCount }
 })
 
+//Delimiter: DAILY/WEEKLY/MONTHLY
 const parseData = (start, end, delimiter) => {
-
+  start = new Date(start);
+  end = new Date(end);
 }
 
 const dataset = dailyGraphData.map(data => data.data);
@@ -1278,7 +1280,7 @@ const barChart = svg.selectAll("rect")
     div.transition()
       .duration(200)
       .style("opacity", .9);
-    div.html(d.date + "<br/>" + d.data)
+    div.html(d.date + "<br/>" + addCommas(d.data))
       .style("left", (d3.event.pageX) + "px")
       .style("top", (d3.event.pageY - 28) + "px");
   })
