@@ -1,4 +1,4 @@
-const daily = [
+const DAILY = [
   {
     "id": "db271a74-e2b1-4111-85f0-6663f9ec49a3",
     "monthly": "SEPTEMBER",
@@ -1037,7 +1037,7 @@ const daily = [
   }
 ]
 
-const weekly = [
+const WEEKLY = [
   {
     "id": "06f8ac99-5d82-4f2a-8c20-7fa40001a420",
     "monthly": "SEPTEMBER",
@@ -1222,21 +1222,49 @@ const addCommas = (nStr) => {
   return x1 + x2;
 }
 
-const dailyGraphData = daily.map(data => {
-  return { date: parseDate(new Date(data.daily)), data: data.alert[0].impactCount }
+const dailyData = DAILY.map(data => {
+  return { date: new Date(data.daily).getTime(), data: data.alert[0].impactCount }
 })
-const weeklyGraphData = weekly.map(data => {
-  return { date: parseDate(new Date(data.daily)), data: data.alert[0].impactCount }
+const weeklyData = WEEKLY.map(data => {
+  return { date: new Date(data.daily).getTime(), data: data.alert[0].impactCount }
 })
 
 //Delimiter: DAILY/WEEKLY/MONTHLY
 const parseData = (start, end, delimiter) => {
-  start = new Date(start);
-  end = new Date(end);
+
+  start = new Date(start).getTime();
+  end = new Date(end).getTime();
+  startDateDifference = graphData[0].date - start;
+  endDateDifference = end - graphData[graphData.length - 1].date;
+
+  let millisecondDelimiter = 0;;
+  if(delimiter === 'DAILY') {
+    this.millisecondDelimiter = 86400000;
+  } else if(delimiter === 'WEEKLY') {
+    this.millisecondDelimiter = 604800000;
+  } else if(delimiter === 'MONTHLY') {
+    this.millisecondDelimiter = 2419200000;
+  } else {
+    console.log('something broke')
+    this.millisecondDelimiter = null;
+  }
+
+  const fakeStartData = this.startDateDifference / this.millisecondDelimiter;
+  const fakeEndData = this.endDateDifference / this.millisecondDelimiter;
+
+  for(let i = 0; i < fakeStartData; i++) {
+    graphData.unshift({date: graphData[0].date - i * this.millisecondDelimiter, data: 0})
+  }
+
+  for(let i = fakeEndData; i > 0; i--) {
+    graphData.push({date: end + i * this.millisecondDelimiter, data: 0})
+  }
 }
 
-const dataset = dailyGraphData.map(data => data.data);
-
+const graphData = weeklyData;
+console.log(graphData)
+parseData("2018-09-18", "2018-11-12", 'WEEKLY')
+console.log(graphData)
 const svgWidth = 1500;
 const svgHeight = 700;
 
@@ -1249,20 +1277,21 @@ const svg = d3.select('svg')
   .attr("height", svgHeight)
   .attr("class", "bar-chart");
 
-const sorted = [...dataset].sort((a, b) => a - b)
 
-let yScale;
-if (dataset.includes(0)) {
+let yScale = () => {};
+if (graphData.map(data => data.data).includes(0)) {
   yScale = d3.scaleLinear().range([svgHeight, svgHeight * .05])
 } else {
   yScale = d3.scaleLinear().range([svgHeight - svgHeight * .05, svgHeight * .05])
 }
+
+const sorted = graphData.map(data => data.data).sort((a, b) => a - b)
 yScale.domain([sorted[0], sorted[sorted.length - 1]])
 
 const barPadding = 5;
-const barWidth = (svgWidth / Object.keys(dailyGraphData).length);
+const barWidth = (svgWidth / Object.keys(graphData).length);
 const barChart = svg.selectAll("rect")
-  .data(dailyGraphData)
+  .data(graphData)
   .enter()
   .append("rect")
   .attr("y", (d) => {
@@ -1280,7 +1309,7 @@ const barChart = svg.selectAll("rect")
     div.transition()
       .duration(200)
       .style("opacity", .9);
-    div.html(d.date + "<br/>" + addCommas(d.data))
+    div.html(parseDate(new Date(d.date)) + "<br/>" + addCommas(d.data))
       .style("left", (d3.event.pageX) + "px")
       .style("top", (d3.event.pageY - 28) + "px");
   })
