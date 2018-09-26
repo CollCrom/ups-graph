@@ -1208,7 +1208,7 @@ const WEEKLY = [
   }
 ]
 
-const parseDate = d3.timeFormat("%m/%d/%y");
+const parseDate = d3.time.format("%m/%d/%y");
 
 const addCommas = (nStr) => {
   nStr += '';
@@ -1261,28 +1261,32 @@ const parseData = (start, end, delimiter) => {
   }
 }
 
-const graphData = weeklyData;
-console.log(graphData)
-parseData("2018-09-18", "2018-11-12", 'WEEKLY')
-console.log(graphData)
+const graphData = dailyData;
+parseData("2018-09-18", "2018-11-19", 'DAILY')
 const svgWidth = 1500;
 const svgHeight = 700;
 
-const div = d3.select("body").append("div")
-  .attr("class", "tooltip")
-  .style("opacity", 0);
+var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return `<strong>Date:</strong> <span style='color:red'>${parseDate(new Date(d.date))}</span>
+            <br/>
+            <strong>Data:</strong> <span style='color:red'>${addCommas(d.data)}</span>`;
+  })
 
 const svg = d3.select('svg')
   .attr("width", svgWidth)
   .attr("height", svgHeight)
   .attr("class", "bar-chart");
 
+  svg.call(tip)
 
 let yScale = () => {};
 if (graphData.map(data => data.data).includes(0)) {
-  yScale = d3.scaleLinear().range([svgHeight, svgHeight * .05])
+  yScale = d3.scale.linear().range([svgHeight, svgHeight * .05])
 } else {
-  yScale = d3.scaleLinear().range([svgHeight - svgHeight * .05, svgHeight * .05])
+  yScale = d3.scale.linear().range([svgHeight - svgHeight * .05, svgHeight * .05])
 }
 
 const sorted = graphData.map(data => data.data).sort((a, b) => a - b)
@@ -1305,16 +1309,18 @@ const barChart = svg.selectAll("rect")
     const translate = [barWidth * i, 0];
     return "translate(" + translate + ")";
   })
-  .on("mouseover", (d) => {
-    div.transition()
-      .duration(200)
-      .style("opacity", .9);
-    div.html(parseDate(new Date(d.date)) + "<br/>" + addCommas(d.data))
-      .style("left", (d3.event.pageX) + "px")
-      .style("top", (d3.event.pageY - 28) + "px");
-  })
-  .on("mouseout", () => {
-    div.transition()
-      .duration(500)
-      .style("opacity", 0);
-  });;
+  .on('mouseover', tip.show)
+  .on('mouseout', tip.hide)
+  // .on("mouseover", (d) => {
+  //   div.transition()
+  //     .duration(200)
+  //     .style("opacity", .9);
+  //   div.html(parseDate(new Date(d.date)) + "<br/>" + addCommas(d.data))
+  //     .style("left", (d3.event.pageX) + "px")
+  //     .style("top", (d3.event.pageY - 28) + "px");
+  // })
+  // .on("mouseout", () => {
+  //   div.transition()
+  //     .duration(500)
+  //     .style("opacity", 0);
+  // });;
