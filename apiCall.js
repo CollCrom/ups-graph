@@ -1208,6 +1208,178 @@ const WEEKLY = [
   }
 ]
 
+
+const MONTHLY = [
+  {
+    "id": "0cc79823-05ec-4f1c-aafb-961f25e215d9",
+    "monthly": "JUNE",
+    "daily": "2018-06-06",
+    "weekly": "2",
+    "year": 2018,
+    "month": 6,
+    "day": 6,
+    "alert": [
+      {
+        "code": null,
+        "desc": null,
+        "pieces": 178301,
+        "cube": 3.40545699E8,
+        "weight": 1713775.0,
+        "impactCount": 18203
+      }
+    ],
+    "totalAlert": {
+      "code": null,
+      "desc": null,
+      "pieces": 178301,
+      "cube": 3.40545699E8,
+      "weight": 1713775.0,
+      "impactCount": 18203
+    },
+    "frequency": "MONTHLY"
+  },
+  {
+    "id": "918b99a8-bfc5-4fb4-ae5f-2aa6ab921bed",
+    "monthly": "JULY",
+    "daily": "2018-07-02",
+    "weekly": "1",
+    "year": 2018,
+    "month": 7,
+    "day": 2,
+    "alert": [
+      {
+        "code": null,
+        "desc": null,
+        "pieces": 197678,
+        "cube": 4.82364562E8,
+        "weight": 2073364.0,
+        "impactCount": 23326
+      }
+    ],
+    "totalAlert": {
+      "code": null,
+      "desc": null,
+      "pieces": 197678,
+      "cube": 4.82364562E8,
+      "weight": 2073364.0,
+      "impactCount": 23326
+    },
+    "frequency": "MONTHLY"
+  },
+  {
+    "id": "b19895e7-52ab-41a5-b6cf-529e400cecf9",
+    "monthly": "AUGUST",
+    "daily": "2018-08-01",
+    "weekly": "1",
+    "year": 2018,
+    "month": 8,
+    "day": 1,
+    "alert": [
+      {
+        "code": null,
+        "desc": null,
+        "pieces": 408526,
+        "cube": 8.15128224E8,
+        "weight": 4263900.0,
+        "impactCount": 47962
+      }
+    ],
+    "totalAlert": {
+      "code": null,
+      "desc": null,
+      "pieces": 408526,
+      "cube": 8.15128224E8,
+      "weight": 4263900.0,
+      "impactCount": 47962
+    },
+    "frequency": "MONTHLY"
+  },
+  {
+    "id": "5ab20690-8b73-44bb-a07f-bcc922c5a70c",
+    "monthly": "SEPTEMBER",
+    "daily": "2018-09-01",
+    "weekly": "1",
+    "year": 2018,
+    "month": 9,
+    "day": 1,
+    "alert": [
+      {
+        "code": null,
+        "desc": null,
+        "pieces": 72147504,
+        "cube": 1.7100720809E11,
+        "weight": 4.06936452E8,
+        "impactCount": 1737796
+      }
+    ],
+    "totalAlert": {
+      "code": null,
+      "desc": null,
+      "pieces": 72147504,
+      "cube": 1.7100720809E11,
+      "weight": 4.06936452E8,
+      "impactCount": 1737796
+    },
+    "frequency": "MONTHLY"
+  },
+  {
+    "id": "2f141e50-74c9-45d0-9cc9-04282b03f0a9",
+    "monthly": "OCTOBER",
+    "daily": "2018-10-01",
+    "weekly": "1",
+    "year": 2018,
+    "month": 10,
+    "day": 1,
+    "alert": [
+      {
+        "code": null,
+        "desc": null,
+        "pieces": 142702100,
+        "cube": 1.89530545636E11,
+        "weight": 8.11059648E8,
+        "impactCount": 3579978
+      }
+    ],
+    "totalAlert": {
+      "code": null,
+      "desc": null,
+      "pieces": 142702100,
+      "cube": 1.89530545636E11,
+      "weight": 8.11059648E8,
+      "impactCount": 3579978
+    },
+    "frequency": "MONTHLY"
+  },
+  {
+    "id": "729c48d0-a274-4f7f-8acb-718c34eada67",
+    "monthly": "NOVEMBER",
+    "daily": "2018-11-01",
+    "weekly": "1",
+    "year": 2018,
+    "month": 11,
+    "day": 1,
+    "alert": [
+      {
+        "code": null,
+        "desc": null,
+        "pieces": 61774956,
+        "cube": 3.83843512222E11,
+        "weight": 4.87863154E8,
+        "impactCount": 780040
+      }
+    ],
+    "totalAlert": {
+      "code": null,
+      "desc": null,
+      "pieces": 61774956,
+      "cube": 3.83843512222E11,
+      "weight": 4.87863154E8,
+      "impactCount": 780040
+    },
+    "frequency": "MONTHLY"
+  }
+]
+
 const parseDate = d3.time.format("%m/%d/%y");
 
 const addCommas = (nStr) => {
@@ -1223,53 +1395,47 @@ const addCommas = (nStr) => {
 }
 
 const dailyData = DAILY.map(data => {
-  return { date: new Date(data.daily).getTime(), data: data.alert[0].impactCount }
+  return { date: moment(data.daily), data: data.alert[0].impactCount }
 })
 const weeklyData = WEEKLY.map(data => {
-  return { date: new Date(data.daily).getTime(), data: data.alert[0].impactCount }
+  return { date: moment(data.daily), data: data.alert[0].impactCount }
+})
+
+const monthlyData = MONTHLY.map(data => {
+  return { date: moment(data.daily), data: data.alert[0].impactCount }
 })
 
 //Delimiter: DAILY/WEEKLY/MONTHLY
 const parseData = (start, end, delimiter) => {
 
-  start = new Date(start).getTime();
-  end = new Date(end).getTime();
-  startDateDifference = graphData[0].date - start;
-  endDateDifference = end - graphData[graphData.length - 1].date;
 
-  let millisecondDelimiter = 0;;
-  if(delimiter === 'DAILY') {
-    this.millisecondDelimiter = 86400000;
-  } else if(delimiter === 'WEEKLY') {
-    this.millisecondDelimiter = 604800000;
-  } else if(delimiter === 'MONTHLY') {
-    this.millisecondDelimiter = 2419200000;
-  } else {
-    console.log('something broke')
-    this.millisecondDelimiter = null;
+
+  start = moment(start);
+  end = moment(end);
+
+  startArr = [],
+  endArr = []
+  while(graphData[0].date > start) {
+    start = moment(start).add(1, delimiter);
+    startArr.push({date: start, data: 0})
+  }
+  while(graphData[graphData.length - 1].date < end) {
+    end = moment(end).subtract(1, delimiter);
+    endArr.unshift({date: end, data: 0});
   }
 
-  const fakeStartData = this.startDateDifference / this.millisecondDelimiter;
-  const fakeEndData = this.endDateDifference / this.millisecondDelimiter;
-
-  for(let i = 0; i < fakeStartData; i++) {
-    graphData.unshift({date: graphData[0].date - i * this.millisecondDelimiter, data: 0})
-  }
-
-  for(let i = fakeEndData; i > 0; i--) {
-    graphData.push({date: end + i * this.millisecondDelimiter, data: 0})
-  }
+  graphData = [...startArr, ...graphData, ...endArr]
 }
 
-const graphData = dailyData;
-parseData("2018-09-18", "2018-11-19", 'DAILY')
+let graphData = monthlyData;
+parseData("2018-04-07", "2018-12-01", 'M')
 const svgWidth = 1500;
 const svgHeight = 700;
 
 var tip = d3.tip()
   .attr('class', 'd3-tip')
   .offset([-10, 0])
-  .html(function(d) {
+  .html(function (d) {
     return `<strong>Date:</strong> <span style='color:red'>${parseDate(new Date(d.date))}</span>
             <br/>
             <strong>Data:</strong> <span style='color:red'>${addCommas(d.data)}</span>`;
@@ -1280,9 +1446,9 @@ const svg = d3.select('svg')
   .attr("height", svgHeight)
   .attr("class", "bar-chart");
 
-  svg.call(tip)
+svg.call(tip)
 
-let yScale = () => {};
+let yScale = () => { };
 if (graphData.map(data => data.data).includes(0)) {
   yScale = d3.scale.linear().range([svgHeight, svgHeight * .05])
 } else {
@@ -1311,16 +1477,3 @@ const barChart = svg.selectAll("rect")
   })
   .on('mouseover', tip.show)
   .on('mouseout', tip.hide)
-  // .on("mouseover", (d) => {
-  //   div.transition()
-  //     .duration(200)
-  //     .style("opacity", .9);
-  //   div.html(parseDate(new Date(d.date)) + "<br/>" + addCommas(d.data))
-  //     .style("left", (d3.event.pageX) + "px")
-  //     .style("top", (d3.event.pageY - 28) + "px");
-  // })
-  // .on("mouseout", () => {
-  //   div.transition()
-  //     .duration(500)
-  //     .style("opacity", 0);
-  // });;
